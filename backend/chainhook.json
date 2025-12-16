@@ -7,7 +7,7 @@
     "testnet": {
       "if_this": {
         "scope": "contract_call",
-        "contract_identifier": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.simple-counter",
+        "contract_identifier": "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.counter",
         "method": "increment"
       },
       "then_that": {
