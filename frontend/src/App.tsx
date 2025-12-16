@@ -1,6 +1,6 @@
 import { AppConfig, UserSession, showConnect } from '@stacks/connect';
-import { StacksTestnet } from '@stacks/network';
-import { callReadOnlyFunction, uintCV, cvToValue, makeContractCall, broadcastTransaction, AnchorMode, PostConditionMode } from '@stacks/transactions';
+import { STACKS_TESTNET } from '@stacks/network';
+import { fetchCallReadOnlyFunction, cvToValue, AnchorMode, PostConditionMode } from '@stacks/transactions';
 import { useState, useEffect } from 'react';
 import './App.css';
 
@@ -10,7 +10,7 @@ function App() {
 
   const appConfig = new AppConfig(['store_write', 'publish_data']);
   const session = new UserSession({ appConfig });
-  const network = new StacksTestnet();
+  const network = STACKS_TESTNET;
 
   // Contract details (update these after deployment)
   const contractAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
@@ -44,7 +44,7 @@ function App() {
 
   const fetchCount = async () => {
     try {
-      const result = await callReadOnlyFunction({
+      const result = await fetchCallReadOnlyFunction({
         contractAddress,
         contractName,
         functionName: 'get-count',
