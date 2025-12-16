@@ -26,7 +26,7 @@ app.post('/api/webhook', (req: Request, res: Response) => {
 
   // Process the event here
   // For now, we just acknowledge it
-  res.status(200).send({ status: 'received' });
+  res.status(200).send({ status: 'centrifuge-active' });
 });
 
 app.listen(port, () => {
