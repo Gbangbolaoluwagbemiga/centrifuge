@@ -21,7 +21,7 @@ function App() {
       setUserSession(session);
       fetchCount();
     } else if (session.isSignInPending()) {
-      session.handlePendingSignIn().then((userData) => {
+      session.handlePendingSignIn().then(() => {
         setUserSession(session);
         fetchCount();
       });
@@ -77,7 +77,7 @@ function App() {
     }
 
     openContractCall({
-      network: STACKS_MAINNET,
+      network: STACKS_MAINNET as any,
       anchorMode: AnchorMode.Any,
       contractAddress,
       contractName,
