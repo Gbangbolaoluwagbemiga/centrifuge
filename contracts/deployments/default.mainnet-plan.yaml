@@ -9,9 +9,9 @@ plan:
     - id: 0
       transactions:
         - contract-publish:
-            contract-name: counter
-            expected-sender: SP3E1HWFNF5JFCGHF1FDWSZPZMFT7ZPHB4SZSHAGQ
-            cost: 11227479
+            contract-name: centrifuge-counter
+            expected-sender: SP2QNSNKR3NRDWNTX0Q7R4T8WGBJ8RE8RA516AKZP
+            cost: 723435
             path: contracts/counter.clar
             anchor-block-only: true
             clarity-version: 4
