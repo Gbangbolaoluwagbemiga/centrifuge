@@ -14,6 +14,7 @@ Centrifuge is a full-stack Stacks application that demonstrates how to use [Hiro
 - Node.js (v18 or higher)
 - [Clarinet](https://github.com/hirosystems/clarinet) (for contract development)
 - [Hiro Wallet](https://wallet.hiro.so/) extension installed in your browser.
+- **Mainnet Deployment**: You need a Stacks wallet with STX for transaction fees.
 
 ## Project Structure
 
@@ -70,6 +71,32 @@ To see the Chainhook in action:
         chainhook predicates scan chainhook.json --testnet
         ```
     *   **Cloud**: Deploy the backend and register the hook on [Hiro Platform](https://platform.hiro.so).
+
+## Mainnet Deployment
+
+To deploy the contract to the Stacks Mainnet:
+
+1.  **Prepare your Wallet**: Ensure you have a 12 or 24-word secret phrase (mnemonic) for a wallet that holds STX.
+2.  **Generate Deployment Plan**:
+    Run the following command in the `contracts/` directory, replacing the mnemonic with your own:
+
+    ```bash
+    cd contracts
+    MNEMONIC="your 12 or 24 word seed phrase here" clarinet deployments generate --mainnet
+    ```
+
+    *Note: This generates a `default.mainnet-plan.yaml` file.*
+
+3.  **Deploy**:
+    Execute the deployment plan:
+
+    ```bash
+    MNEMONIC="your 12 or 24 word seed phrase here" clarinet deploy --mainnet --plan default.mainnet-plan.yaml
+    ```
+
+    *Warning: This will cost real STX.*
+
+4.  **Verify**: Check the explorer link provided in the output to confirm the contract is deployed.
 
 ## License
 
