@@ -1,4 +1,4 @@
-import { AppConfig, UserSession, showConnect, openContractCall } from '@stacks/connect';
+import { AppConfig, UserSession, showConnect, openContractCall, authenticate } from '@stacks/connect';
 import { STACKS_MAINNET } from '@stacks/network';
 import { fetchCallReadOnlyFunction, cvToValue, AnchorMode, PostConditionMode } from '@stacks/transactions';
 import { useState, useEffect } from 'react';
@@ -29,7 +29,7 @@ function App() {
   }, []);
 
   const connectWallet = () => {
-    showConnect({
+    const authOptions = {
       appDetails: {
         name: 'Centrifuge Counter',
         icon: window.location.origin + '/vite.svg',
@@ -39,7 +39,17 @@ function App() {
         window.location.reload();
       },
       userSession: session,
-    });
+    };
+
+    if (typeof showConnect === 'function') {
+      showConnect(authOptions);
+    } else if (typeof authenticate === 'function') {
+      console.warn('showConnect not found, falling back to authenticate');
+      authenticate(authOptions);
+    } else {
+      console.error('No connect function found in @stacks/connect');
+      alert('Wallet connection library failed to load. Please check console.');
+    }
   };
 
   const fetchCount = async () => {
@@ -50,7 +60,7 @@ function App() {
         functionName: 'get-count',
         functionArgs: [],
         network,
-        senderAddress: contractAddress, // Using contract address as sender for read-only
+        senderAddress: contractAddress,
       });
       setCount(Number(cvToValue(result)));
     } catch (e) {
@@ -61,8 +71,13 @@ function App() {
   const executeAction = (action: 'increment' | 'decrement') => {
     if (!userSession?.isUserSignedIn()) return;
     
+    if (typeof openContractCall !== 'function') {
+      console.error('openContractCall is not a function');
+      return;
+    }
+
     openContractCall({
-      network,
+      network: STACKS_MAINNET,
       anchorMode: AnchorMode.Any,
       contractAddress,
       contractName,
