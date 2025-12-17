@@ -1,6 +1,6 @@
 import { AppConfig, UserSession, showConnect, openContractCall, authenticate } from '@stacks/connect';
 import { STACKS_MAINNET } from '@stacks/network';
-import { fetchCallReadOnlyFunction, cvToValue, cvToJSON, AnchorMode, PostConditionMode, stringUtf8CV } from '@stacks/transactions';
+import { fetchCallReadOnlyFunction, cvToValue, cvToJSON, AnchorMode, PostConditionMode, stringUtf8CV, uintCV } from '@stacks/transactions';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -8,7 +8,7 @@ import MatrixBackground from './components/MatrixBackground';
 
 // King of the Hill Contract
 const contractAddress = 'SP2QNSNKR3NRDWNTX0Q7R4T8WGBJ8RE8RA516AKZP';
-const contractName = 'centrifuge-king';
+const contractName = 'centrifuge-king-v2';
 
 interface KingInfo {
   king: string;
@@ -20,6 +20,7 @@ function App() {
   const [kingInfo, setKingInfo] = useState<KingInfo | null>(null);
   const [userSession, setUserSession] = useState<UserSession | null>(null);
   const [newMessage, setNewMessage] = useState<string>('');
+  const [bidAmount, setBidAmount] = useState<string>('1.0');
   const [isClaiming, setIsClaiming] = useState(false);
   const [hackText, setHackText] = useState("CENTRIFUGE KING");
 
@@ -148,6 +149,11 @@ function App() {
       alert("Enter a message for your reign!");
       return;
     }
+    const amount = parseFloat(bidAmount);
+    if (isNaN(amount) || amount <= 0) {
+      alert("Enter a valid STX amount.");
+      return;
+    }
     
     setIsClaiming(true);
 
@@ -159,13 +165,15 @@ function App() {
       colors: ['#00ffff', '#ff00ff', '#ffffff']
     });
 
+    const amountMicroSTX = Math.floor(amount * 1_000_000);
+
     openContractCall({
       network: STACKS_MAINNET as any,
       anchorMode: AnchorMode.Any,
       contractAddress,
       contractName,
       functionName: 'claim-crown',
-      functionArgs: [stringUtf8CV(newMessage) as any],
+      functionArgs: [uintCV(amountMicroSTX), stringUtf8CV(newMessage)] as any,
       postConditionMode: PostConditionMode.Allow,
       onFinish: (data) => {
         console.log('TxId:', data.txId);
@@ -326,6 +334,17 @@ function App() {
               ) : (
                 <div className="space-y-8">
                   <div className="relative group">
+                    <label className="block text-xs text-neon-blue mb-2 uppercase tracking-widest">Bid Amount (STX)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0.1"
+                      value={bidAmount}
+                      onChange={(e) => setBidAmount(e.target.value)}
+                      placeholder="AMOUNT..."
+                      className="cyber-input h-14 text-lg bg-black/50 border-neon-blue/50 focus:border-neon-pink focus:shadow-[0_0_15px_rgba(255,0,255,0.3)] transition-all mb-4"
+                    />
+                    
                     <label className="block text-xs text-neon-blue mb-2 uppercase tracking-widest">Royal Decree (Message)</label>
                     <input
                       type="text"
@@ -342,11 +361,12 @@ function App() {
                   
                   <div className="bg-gradient-to-r from-neon-pink/10 to-transparent border-l-4 border-neon-pink p-4">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs text-neon-pink uppercase">Cost to Claim</span>
+                      <span className="text-xs text-neon-pink uppercase">Current Stake to Beat</span>
                       <span className="text-xl font-bold text-white">{(kingInfo ? (kingInfo.price / 1000000).toFixed(1) : '...')} STX</span>
                     </div>
-                    <p className="text-[10px] text-gray-400 uppercase">
-                      Funds are transferred directly to the previous King.
+                    <p className="text-[10px] text-gray-400 uppercase leading-relaxed">
+                      If Bid &gt; Stake: You become King. Previous King gets 100% refund.<br/>
+                      If Bid &le; Stake: You fail. 95% refunded. 5% tribute to King.
                     </p>
                   </div>
 
