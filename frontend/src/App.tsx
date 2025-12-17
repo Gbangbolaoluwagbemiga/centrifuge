@@ -302,7 +302,7 @@ function App() {
                   <>
                      <div className="text-4xl">⚠️</div>
                      <p className="text-red-500 font-bold text-center max-w-xs">{contractError}</p>
-                     <p className="text-gray-500 text-xs text-center">Tx: 898a...329</p>
+                     <p className="text-gray-500 text-xs text-center">Tx: 9f72...8de</p>
                   </>
                 ) : (
                   <>
