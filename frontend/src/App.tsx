@@ -175,50 +175,62 @@ function App() {
 
     const amountMicroSTX = Math.floor(amount * 1_000_000);
 
-    openContractCall({
-      network: STACKS_MAINNET as any,
-      anchorMode: AnchorMode.Any,
-      contractAddress,
-      contractName,
-      functionName: 'claim-crown',
-      functionArgs: [uintCV(amountMicroSTX), stringUtf8CV(newMessage)] as any,
-      postConditionMode: PostConditionMode.Allow,
-      onFinish: (data) => {
-        console.log('TxId:', data.txId);
-        setIsClaiming(false);
-        setNewMessage('');
-        
-        // MOAR CONFETTI
-        const duration = 3000;
-        const animationEnd = Date.now() + duration;
-        const random = (min: number, max: number) => Math.random() * (max - min) + min;
+    const uCV = uintCV(amountMicroSTX);
+    const sCV = stringUtf8CV(newMessage);
+    
+    console.log('Claiming with:', { amountMicroSTX, newMessage });
+    console.log('CVs:', { uCV, sCV });
 
-        const interval: any = setInterval(function() {
-          const timeLeft = animationEnd - Date.now();
-          if (timeLeft <= 0) return clearInterval(interval);
-          const particleCount = 50 * (timeLeft / duration);
-          confetti({
-            particleCount,
-            startVelocity: 30,
-            spread: 360,
-            ticks: 60,
-            origin: { x: random(0.1, 0.3), y: Math.random() - 0.2 },
-            colors: ['#00ffff', '#ff00ff']
-          });
-          confetti({
-            particleCount,
-            startVelocity: 30,
-            spread: 360,
-            ticks: 60,
-            origin: { x: random(0.7, 0.9), y: Math.random() - 0.2 },
-            colors: ['#00ffff', '#ff00ff']
-          });
-        }, 250);
+    try {
+      openContractCall({
+        network: STACKS_MAINNET as any,
+        anchorMode: AnchorMode.Any,
+        contractAddress,
+        contractName,
+        functionName: 'claim-crown',
+        functionArgs: [uCV, sCV] as any,
+        postConditionMode: PostConditionMode.Allow,
+        onFinish: (data) => {
+          console.log('TxId:', data.txId);
+          setIsClaiming(false);
+          setNewMessage('');
+          
+          // MOAR CONFETTI
+          const duration = 3000;
+          const animationEnd = Date.now() + duration;
+          const random = (min: number, max: number) => Math.random() * (max - min) + min;
 
-        alert('Transaction broadcasted! The throne awaits.');
-      },
-      onCancel: () => setIsClaiming(false),
-    });
+          const interval: any = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+            if (timeLeft <= 0) return clearInterval(interval);
+            const particleCount = 50 * (timeLeft / duration);
+            confetti({
+              particleCount,
+              startVelocity: 30,
+              spread: 360,
+              ticks: 60,
+              origin: { x: random(0.1, 0.3), y: Math.random() - 0.2 },
+              colors: ['#00ffff', '#ff00ff']
+            });
+            confetti({
+              particleCount,
+              startVelocity: 30,
+              spread: 360,
+              ticks: 60,
+              origin: { x: random(0.7, 0.9), y: Math.random() - 0.2 },
+              colors: ['#00ffff', '#ff00ff']
+            });
+          }, 250);
+
+          alert('Transaction broadcasted! The throne awaits.');
+        },
+        onCancel: () => setIsClaiming(false),
+      });
+    } catch (e) {
+      console.error("Transaction failed to start:", e);
+      setIsClaiming(false);
+      alert("Failed to start transaction. Check console.");
+    }
   };
 
   const truncateAddress = (addr: string) => {
