@@ -175,11 +175,12 @@ function App() {
 
     const amountMicroSTX = Math.floor(amount * 1_000_000);
 
-    const uCV = uintCV(amountMicroSTX);
-    const sCV = stringUtf8CV(newMessage);
-    
+    // Force explicit conversion to plain objects if CVs fail validation due to multiple library instances
+    const uCV = { type: 1, value: BigInt(amountMicroSTX) }; // ClarityType.UInt = 1
+    const sCV = { type: 14, data: newMessage }; // ClarityType.StringUTF8 = 14
+
     console.log('Claiming with:', { amountMicroSTX, newMessage });
-    console.log('CVs:', { uCV, sCV });
+    console.log('CVs (Manual):', { uCV, sCV });
 
     try {
       openContractCall({
